@@ -1,18 +1,57 @@
-import { useState } from "react";
-import List from "./component/List";
-import Data from "./component/Data";
+import { useEffect, useState } from "react";
+import Loading from "./component/Loading";
+import Tours from "./component/Tours";
 
-function App() {
-  const [people, setPeople] = useState(Data);
+const App = () => {
+  const [loading, setLoading] = useState(false);
+  const [tours, setTours] = useState([]);
+
+  const removeTour = (id) => {
+    const newTours = tours.filter((tour) => tour.id !== id);
+    setTours(newTours);
+  };
+
+  const toursData = async () => {
+    try {
+      const response = await fetch(
+        "https://course-api.com/react-tours-project"
+      );
+      const tours = await response.json();
+      setLoading(false);
+      setTours(tours);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    toursData();
+  }, []);
+
+  if (loading) {
+    return (
+      <main>
+        <Loading />
+      </main>
+    );
+  }
+  if (tours.length === 0) {
+    return (
+      <main>
+        <div className="title">
+          <h2>No Tours Left</h2>
+          <button onClick={toursData} className="btn">
+            Refresh
+          </button>
+        </div>
+      </main>
+    );
+  }
   return (
-    <>
-      <div className="container">
-        <h3>{people.length} Birthday</h3>
-        <List people={people} />
-        <button onClick={() => setPeople([])}>Clear All</button>
-      </div>
-    </>
+    <main>
+      <Tours tours={tours} removeTour={removeTour} />
+    </main>
   );
-}
+};
 
 export default App;
