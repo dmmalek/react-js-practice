@@ -1,15 +1,19 @@
-import React from "react";
-import Review from "./component/Review";
+import { useState } from "react";
+import Questdata from "./component/Questdata";
+import Question from "./component/Question";
+
 const App = () => {
+  const [data, setData] = useState(Questdata);
   return (
     <main>
-      <section className="container">
-        <div className="title">
-          <h2>our reviews</h2>
-          <div className="underline"></div>
-        </div>
-        <Review />
-      </section>
+      <div className="container">
+        <h3>questions and answers about login</h3>
+        <section className="info">
+          {data.map((data) => {
+            return <Question key={data.id} {...data}></Question>;
+          })}
+        </section>
+      </div>
     </main>
   );
 };
