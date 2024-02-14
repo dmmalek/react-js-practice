@@ -1,64 +1,70 @@
-import { useEffect, useState } from "react";
-import { FaAngleDoubleRight } from "react-icons/fa";
-const url = "https://course-api.com/react-tabs-project";
-const App = () => {
-  const [data, setData] = useState([]);
-  const [value, setValue] = useState(0);
-  const [loading, setLoading] = useState(true);
+import React, { useEffect, useState } from "react";
+import data from "./component/Globaldata";
+import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
+import { FaQuoteRight } from "react-icons/fa";
 
-  const fetchData = async () => {
-    setLoading(true);
-    const response = await fetch(url);
-    const getData = await response.json();
-    setData(getData);
-    setLoading(false);
-  };
+const App = () => {
+  const [people, setPeople] = useState(data);
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const lastIndex = people.length - 1;
+    if (index < 0) {
+      setIndex(lastIndex);
+    }
+    if (index > lastIndex) {
+      setIndex(0);
+    }
+  }, [index, people]);
 
-  if (loading) return <h1>Loading....</h1>;
-  const { company, dates, duties, title } = data[value];
+  useEffect(() => {
+    let slider = setInterval(() => {
+      setIndex(index + 1);
+    }, 5000);
+    return () => {
+      clearInterval(slider);
+    };
+  }, [index]);
+
   return (
     <section className="section">
       <div className="title">
-        <h2>experience</h2>
-        <div className="underline"></div>
+        <h2>
+          <span>/</span>reviews
+        </h2>
       </div>
-      <div className="jobs-center">
-        {/* btn container */}
-        <div className="btn-container">
-          {data.map((item, index) => {
-            return (
-              <button
-                key={item.id}
-                onClick={() => setValue(index)}
-                className={`job-btn ${index === value && "active-btn"}`}
-              >
-                {item.company}
-              </button>
-            );
-          })}
-        </div>
-        {/* job info */}
-        <article className="job-info">
-          <h3>{title}</h3>
-          <h4>{company}</h4>
-          <p className="job-date">{dates}</p>
-          {duties.map((duty, index) => {
-            return (
-              <div key={index} className="job-desc">
-                <FaAngleDoubleRight className="job-icon"></FaAngleDoubleRight>
-                <p>{duty}</p>
-              </div>
-            );
-          })}
-        </article>
+      <div className="section-center">
+        {people.map((person, personIndex) => {
+          const { id, image, name, title, quote } = person;
+
+          let position = "nextSlide";
+          if (personIndex === index) {
+            position = "activeSlide";
+          }
+          if (
+            personIndex === index - 1 ||
+            (index === 0 && personIndex === people.length - 1)
+          ) {
+            position = "lastSlide";
+          }
+
+          return (
+            <article className={position} key={id}>
+              <img className="person-img" src={image} alt="" />
+              <h4>{name}</h4>
+              <p className="title">{title}</p>
+              <p className="text">{quote}</p>
+              <FaQuoteRight className="icon" />
+            </article>
+          );
+        })}
+        <button className="prev" onClick={() => setIndex(index - 1)}>
+          <FiChevronLeft />
+        </button>
+        <button className="next" onClick={() => setIndex(index + 1)}>
+          <FiChevronRight />
+        </button>
       </div>
-      <button type="button" className="btn">
-        more info
-      </button>
     </section>
   );
 };
