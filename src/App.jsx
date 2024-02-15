@@ -1,70 +1,44 @@
-import React, { useEffect, useState } from "react";
-import data from "./component/Globaldata";
-import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
-import { FaQuoteRight } from "react-icons/fa";
+import React, { useState } from "react";
+import text from "./component/Globaldata";
 
 const App = () => {
-  const [people, setPeople] = useState(data);
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const lastIndex = people.length - 1;
-    if (index < 0) {
-      setIndex(lastIndex);
+  const [count, setCount] = useState(0);
+  const [data, setData] = useState([]);
+  const hadleSubmit = (e) => {
+    e.preventDefault();
+    let amount = parseInt(count);
+    if (count <= 0) {
+      amount = 1;
     }
-    if (index > lastIndex) {
-      setIndex(0);
+    if (8 < count) {
+      amount = 8;
     }
-  }, [index, people]);
 
-  useEffect(() => {
-    let slider = setInterval(() => {
-      setIndex(index + 1);
-    }, 5000);
-    return () => {
-      clearInterval(slider);
-    };
-  }, [index]);
+    setData(text.slice(0, amount));
+  };
 
   return (
-    <section className="section">
-      <div className="title">
-        <h2>
-          <span>/</span>reviews
-        </h2>
-      </div>
-      <div className="section-center">
-        {people.map((person, personIndex) => {
-          const { id, image, name, title, quote } = person;
-
-          let position = "nextSlide";
-          if (personIndex === index) {
-            position = "activeSlide";
-          }
-          if (
-            personIndex === index - 1 ||
-            (index === 0 && personIndex === people.length - 1)
-          ) {
-            position = "lastSlide";
-          }
-
-          return (
-            <article className={position} key={id}>
-              <img className="person-img" src={image} alt="" />
-              <h4>{name}</h4>
-              <p className="title">{title}</p>
-              <p className="text">{quote}</p>
-              <FaQuoteRight className="icon" />
-            </article>
-          );
+    <section className="section-center">
+      <h3>tired of boring lorem ipsum?</h3>
+      <form className="lorem-form" onSubmit={hadleSubmit}>
+        <label htmlFor="amount">Paragraph :</label>
+        <input
+          type="number"
+          name="amount"
+          id="amount"
+          value={count}
+          onChange={(e) => setCount(e.target.value)}
+        />
+        <button type="submit" className="btn">
+          Generate
+        </button>
+      </form>
+      <article className="lorem-ipsum">
+        {data.map((item, index) => {
+          return <p key={index}>{item}</p>;
         })}
-        <button className="prev" onClick={() => setIndex(index - 1)}>
-          <FiChevronLeft />
-        </button>
-        <button className="next" onClick={() => setIndex(index + 1)}>
-          <FiChevronRight />
-        </button>
-      </div>
+        ;
+      </article>
     </section>
   );
 };
